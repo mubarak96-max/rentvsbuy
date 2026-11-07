@@ -4,7 +4,7 @@ import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
-  site: process.env.SITE_URL ?? 'https://rentbuyatlas.com',
+  site: process.env.SITE_URL ?? 'https://rentvsbuying.xyz',
   trailingSlash: 'always',
   integrations: [react()],
   build: { format: 'directory' },

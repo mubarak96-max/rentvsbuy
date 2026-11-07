@@ -1,7 +1,7 @@
 // Central site settings. Change SITE_URL to your production domain before deploying.
 export const SITE = {
   name: 'RentBuyAtlas',
-  url: (import.meta.env.SITE_URL as string | undefined) ?? 'https://rentbuyatlas.com',
+  url: (import.meta.env.SITE_URL as string | undefined) ?? 'https://rentvsbuying.xyz',
   tagline: 'The global rent vs buy calculator',
   description:
     'Free rent vs buy calculator for the world’s top housing markets. Local taxes, transaction costs and rates, with break-even year, break-even rent and the 5% rule.',
