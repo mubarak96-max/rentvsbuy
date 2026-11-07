@@ -1,0 +1,59 @@
+---
+import { MARKETS } from '../data/markets';
+import { simulate, breakEvenRent, priceToRent } from '../lib/calc';
+
+const countryPages: Record<string, string> = {
+  us: 'united-states', uk: 'united-kingdom', canada: 'canada', australia: 'australia', uae: 'uae', india: 'india',
+  singapore: 'singapore', germany: 'germany', 'new-zealand': 'new-zealand', ireland: 'ireland', france: 'france', spain: 'spain',
+};
+
+const rows = MARKETS.map((m) => {
+  const i = { ...m, years: 10, sharePct: 100, sharedRentPct: 2.75 };
+  const r = simulate(i);
+  const be = breakEvenRent(i);
+  const money = new Intl.NumberFormat(m.locale, { style: 'currency', currency: m.currency, maximumFractionDigits: 0 });
+  return {
+    m,
+    href: countryPages[m.id] ? `/rent-vs-buy-calculator/${countryPages[m.id]}/` : null,
+    ptr: priceToRent(m),
+    yield: (100 / priceToRent(m)),
+    breakEven: r.breakEvenYear,
+    buyWins: r.advantage >= 0,
+    rent: money.format(m.monthlyRent),
+    beRent: money.format(be),
+    price: money.format(m.homePrice),
+  };
+});
+---
+<div class="table-scroll" style="border:1px solid var(--line);border-radius:14px">
+  <table class="market-table">
+    <caption class="sr-only" style="position:absolute;left:-9999px">Rent vs buy comparison across 27 housing markets using RentBuyAtlas default assumptions, 10-year horizon</caption>
+    <thead>
+      <tr>
+        <th scope="col">Market</th>
+        <th scope="col">Typical price</th>
+        <th scope="col">Typical rent /mo</th>
+        <th scope="col">Price-to-rent</th>
+        <th scope="col">Gross yield</th>
+        <th scope="col">Break-even rent /mo</th>
+        <th scope="col">Break-even year</th>
+        <th scope="col">10-year verdict</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr>
+          <th scope="row" style="font-weight:600;text-align:left">{r.m.flag} {r.href ? <a href={r.href}>{r.m.name}</a> : r.m.name}</th>
+          <td>{r.price}</td>
+          <td>{r.rent}</td>
+          <td>{r.ptr.toFixed(1)}</td>
+          <td>{r.yield.toFixed(1)}%</td>
+          <td>{r.beRent}</td>
+          <td>{r.breakEven ? `Year ${r.breakEven}` : '30+ years'}</td>
+          <td class={r.buyWins ? 'lean-buy' : 'lean-rent'}>{r.buyWins ? 'Buy' : 'Rent'}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+<p class="meta" style="margin-top:8px">Calculated with each market’s default assumptions (late 2026) over a 10-year stay. Your numbers will differ — select the market in the calculator and edit any input.</p>

@@ -1,0 +1,125 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Calculator from '../../components/Calculator.tsx';
+import Faq from '../../components/Faq.astro';
+import Toc from '../../components/Toc.astro';
+import { sortedPosts, blogUrl, readingTime, toolLinks } from '../../lib/links';
+import { SITE, categoryImage, categorySlug } from '../../site';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const d = entry.data;
+const { Content, headings } = await render(entry);
+const site = Astro.site!;
+const url = new URL(Astro.url.pathname, site).href;
+const image = d.heroImage ?? categoryImage(d.category);
+const minutes = readingTime(entry.body);
+
+const toolId = d.relatedTool.replace(/^\/|\/$/g, '');
+const isHub = toolId === 'rent-vs-buy-calculator';
+const tool = toolId && !isHub ? await getEntry('tools', toolId) : undefined;
+const toolTitle = tool?.data.h1 ?? (isHub ? 'Rent vs Buy Calculator by Country' : 'Rent vs Buy Calculator');
+const toolMarket = tool?.data.market ?? 'us';
+const toolVariant = tool?.data.variant ?? 'standard';
+
+const posts = await sortedPosts();
+const related = posts.filter((p) => p.id !== entry.id && p.data.category === d.category).slice(0, 4);
+const more = posts.filter((p) => p.id !== entry.id && p.data.category !== d.category).slice(0, 6 - related.length);
+const tools = (await toolLinks()).filter((t) => !t.isCountry).slice(0, 8);
+
+const fmtDate = (x: Date) => x.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: d.h1 ?? d.title,
+    description: d.description,
+    image: new URL(image, site).href,
+    datePublished: d.publishDate.toISOString(),
+    dateModified: (d.updatedDate ?? d.publishDate).toISOString(),
+    author: { '@type': 'Organization', name: SITE.author, url: new URL('/about/', site).href },
+    publisher: { '@id': `${site.href}#org` },
+    mainEntityOfPage: url,
+    articleSection: d.category,
+    keywords: [d.primaryKeyword, ...d.keywords].join(', '),
+    wordCount: (entry.body ?? '').split(/\s+/).filter(Boolean).length,
+    speakable: { '@type': 'SpeakableSpecification', cssSelector: ['.answer-box'] },
+  },
+  ...(d.faqs.length
+    ? [{
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: d.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+      }]
+    : []),
+];
+const crumbs = [
+  { name: 'Guides', href: '/blog/' },
+  { name: d.category, href: `/blog/category/${categorySlug(d.category)}/` },
+  { name: d.h1 ?? d.title, href: Astro.url.pathname },
+];
+---
+<Base title={d.title} description={d.description} type="article" image={image} crumbs={crumbs} jsonLd={jsonLd} publishedTime={d.publishDate} modifiedTime={d.updatedDate}>
+  <div class="wrap">
+    <div class="layout">
+      <article class="prose">
+        <h1>{d.h1 ?? d.title}</h1>
+        <p class="meta">
+          <a class="cat" href={`/blog/category/${categorySlug(d.category)}/`}>{d.category}</a>
+          <span>By {SITE.author}</span>
+          <span>Updated <time datetime={(d.updatedDate ?? d.publishDate).toISOString()}>{fmtDate(d.updatedDate ?? d.publishDate)}</time></span>
+          <span>{minutes} min read</span>
+        </p>
+        <div class="post-hero"><img src={image} alt="" width="1200" height="675" loading="eager" fetchpriority="high" /></div>
+        <div class="answer-box">
+          <p class="label">Short answer</p>
+          <p>{d.tldr}</p>
+        </div>
+        {d.keyTakeaways.length > 0 && (
+          <div class="takeaways">
+            <h2>Key takeaways</h2>
+            <ul>{d.keyTakeaways.map((k) => <li>{k}</li>)}</ul>
+          </div>
+        )}
+        <Content />
+        <h2 id="run-your-numbers">Run your own numbers</h2>
+        <p>Every rule of thumb above depends on your rent, price, rate and how long you stay. Use the <a href={d.relatedTool}>{toolTitle}</a> below — it starts with local defaults you can change.</p>
+      </article>
+      <aside class="aside">
+        <Toc headings={headings} />
+        <div class="card cta-card">
+          <h3>{toolTitle}</h3>
+          <p style="margin:0 0 12px;font-size:.92rem">See your break-even year and break-even rent in seconds.</p>
+          <a class="btn" href={d.relatedTool}>Open calculator</a>
+        </div>
+        <div class="card">
+          <h2>Calculators</h2>
+          <ul>{tools.map((t) => <li><a href={t.href}>{t.title}</a></li>)}</ul>
+        </div>
+      </aside>
+    </div>
+    <section class="calc-section" aria-label="Rent vs buy calculator">
+      <Calculator client:visible market={toolMarket} variant={toolVariant} />
+    </section>
+    <div class="layout" style="padding-bottom:0">
+      <div class="prose"><Faq faqs={d.faqs} /></div>
+    </div>
+    <section class="section">
+      <div class="section-head"><h2>Keep reading</h2><a href="/blog/">All guides →</a></div>
+      <div class="grid-cards">
+        {[...related, ...more].map((p) => (
+          <a class="tile" href={blogUrl(p.id)}>
+            <span class="t-meta" style="padding:0;margin:0">{p.data.category}</span>
+            <span class="t-title">{p.data.h1 ?? p.data.title}</span>
+            <span class="t-desc">{p.data.description}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+  </div>
+</Base>

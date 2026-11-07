@@ -1,0 +1,28 @@
+---
+import Base from '../../../layouts/Base.astro';
+import PostGrid from '../../../components/PostGrid.astro';
+import { sortedPosts } from '../../../lib/links';
+import { CATEGORIES, categorySlug } from '../../../site';
+
+export function getStaticPaths() {
+  return CATEGORIES.map((c) => ({ params: { cat: categorySlug(c) }, props: { category: c } }));
+}
+const { category } = Astro.props;
+const posts = (await sortedPosts()).filter((p) => p.data.category === category);
+const blurbs: Record<string, string> = {
+  'Decision Guides': 'Frameworks and honest trade-offs to help you decide whether renting or buying fits your life and finances.',
+  'Costs & Math': 'The numbers behind rent vs buy: unrecoverable costs, break-even points, opportunity cost and the 5% rule.',
+  Mortgages: 'How mortgage rates, payment schedules and loan structure change the rent vs buy answer.',
+  Markets: 'Country and city analysis of renting vs buying, from Dubai and London to New York, Sydney and beyond.',
+  Alternatives: 'Shared ownership, rent-to-own, leasing, renting and investing, and other paths between renting and owning.',
+};
+---
+<Base title={`${category}: Rent vs Buy Guides`} description={blurbs[category]} crumbs={[{ name: 'Guides', href: '/blog/' }, { name: category, href: `/blog/category/${categorySlug(category)}/` }]}>
+  <div class="wrap">
+    <header class="hero" style="padding-top:8px">
+      <h1>{category}</h1>
+      <p class="lede">{blurbs[category]}</p>
+    </header>
+    <section class="section" style="padding-top:8px"><PostGrid posts={posts} eager={3} /></section>
+  </div>
+</Base>

@@ -1,0 +1,19 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { blogUrl, readingTime } from '../lib/links';
+import { categoryImage } from '../site';
+interface Props { posts: CollectionEntry<'blog'>[]; eager?: number }
+const { posts, eager = 0 } = Astro.props;
+---
+<div class="grid-cards">
+  {posts.map((p, i) => (
+    <a class="tile post-card" href={blogUrl(p.id)}>
+      <img src={p.data.heroImage ?? categoryImage(p.data.category)} alt="" width="1200" height="675" loading={i < eager ? 'eager' : 'lazy'} decoding="async" />
+      <span class="pc-body">
+        <span class="t-meta" style="padding:0">{p.data.category} · {readingTime(p.body)} min read</span>
+        <span class="t-title">{p.data.h1 ?? p.data.title}</span>
+        <span class="t-desc">{p.data.description}</span>
+      </span>
+    </a>
+  ))}
+</div>

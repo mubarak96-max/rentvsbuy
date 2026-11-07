@@ -1,0 +1,112 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Calculator from '../components/Calculator.tsx';
+import Faq from '../components/Faq.astro';
+import Toc from '../components/Toc.astro';
+import { getMarket } from '../data/markets';
+import { toolLinks, sortedPosts, blogUrl } from '../lib/links';
+import { SITE } from '../site';
+
+export async function getStaticPaths() {
+  const tools = await getCollection('tools');
+  return tools.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const d = entry.data;
+const { Content, headings } = await render(entry);
+const market = getMarket(d.market);
+const isCountry = entry.id.startsWith('rent-vs-buy-calculator/');
+const site = Astro.site!;
+const url = new URL(Astro.url.pathname, site).href;
+
+const tools = await toolLinks();
+const otherTools = tools.filter((t) => t.id !== entry.id && t.isCountry !== isCountry).slice(0, 8);
+const siblingTools = tools.filter((t) => t.id !== entry.id && t.isCountry === isCountry).slice(0, 8);
+const posts = await sortedPosts();
+const relatedPosts = posts
+  .filter((p) => p.data.relatedTool === Astro.url.pathname)
+  .concat(posts.filter((p) => p.data.relatedTool !== Astro.url.pathname))
+  .slice(0, 5);
+
+const crumbs = isCountry
+  ? [{ name: 'Rent vs buy by country', href: '/rent-vs-buy-calculator/' }, { name: market.name, href: Astro.url.pathname }]
+  : [{ name: d.h1, href: Astro.url.pathname }];
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: d.h1,
+    url,
+    description: d.description,
+    applicationCategory: 'FinanceApplication',
+    operatingSystem: 'Any (web browser)',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: market.currency },
+    publisher: { '@id': `${site.href}#org` },
+    ...(isCountry ? { areaServed: { '@type': 'Country', name: market.name } } : {}),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: d.title,
+    url,
+    description: d.description,
+    dateModified: d.updatedDate.toISOString(),
+    isPartOf: { '@id': `${site.href}#website` },
+    about: d.primaryKeyword,
+    keywords: [d.primaryKeyword, ...d.keywords].join(', '),
+    speakable: { '@type': 'SpeakableSpecification', cssSelector: ['.answer-box'] },
+  },
+  ...(d.faqs.length
+    ? [{
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: d.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+      }]
+    : []),
+];
+const updated = d.updatedDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+<Base title={d.title} description={d.description} crumbs={crumbs} jsonLd={jsonLd} modifiedTime={d.updatedDate}>
+  <div class="wrap">
+    <header class="hero" style="padding-top:8px">
+      <span class="eyebrow">{isCountry ? `${market.flag} ${market.name} · ${market.currency}` : 'Free calculator'}</span>
+      <h1>{d.h1}</h1>
+      <p class="lede">{d.intro}</p>
+      <p class="meta">Updated {updated} · By {SITE.author} · <a href="/methodology/">Methodology</a></p>
+    </header>
+
+    <section class="calc-section" id="calculator" aria-label="Calculator">
+      <Calculator client:load market={d.market} variant={d.variant} horizonYears={d.horizonYears} />
+    </section>
+
+    <div class="layout">
+      <article class="prose">
+        <div class="answer-box">
+          <p class="label">Quick answer</p>
+          <p>{d.tldr}</p>
+        </div>
+        <Content />
+        <Faq faqs={d.faqs} />
+        <p class="meta" style="margin-top:2rem">This calculator is for education and planning. It is not financial advice. Defaults for {market.name} are illustrative late-2026 estimates; check current rates and fees locally.</p>
+      </article>
+      <aside class="aside">
+        <Toc headings={headings} />
+        <div class="card">
+          <h2>{isCountry ? 'Other countries' : 'More calculators'}</h2>
+          <ul>{siblingTools.map((t) => <li><a href={t.href}>{t.title}</a></li>)}</ul>
+        </div>
+        <div class="card">
+          <h2>{isCountry ? 'Calculators by goal' : 'By country'}</h2>
+          <ul>{otherTools.map((t) => <li><a href={t.href}>{t.title}</a></li>)}</ul>
+        </div>
+        <div class="card">
+          <h2>Related guides</h2>
+          <ul>{relatedPosts.map((p) => <li><a href={blogUrl(p.id)}>{p.data.h1 ?? p.data.title}</a></li>)}</ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+</Base>

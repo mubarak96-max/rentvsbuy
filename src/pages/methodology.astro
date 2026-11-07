@@ -1,0 +1,90 @@
+---
+import Base from '../layouts/Base.astro';
+import { MARKETS } from '../data/markets';
+
+const site = Astro.site!;
+const jsonLd = [{
+  '@context': 'https://schema.org',
+  '@type': 'TechArticle',
+  headline: 'How the RentBuyAtlas rent vs buy calculator works',
+  url: new URL('/methodology/', site).href,
+  dateModified: '2026-11-07',
+  author: { '@type': 'Organization', name: 'RentBuyAtlas Editorial Team' },
+  publisher: { '@id': `${site.href}#org` },
+}];
+const pct = (v: number) => `${v}%`;
+---
+<Base title="Methodology: How Our Rent vs Buy Calculator Works" description="The exact model behind the RentBuyAtlas rent vs buy calculator: monthly simulation, opportunity cost, break-even year, break-even rent, 5% rule and market defaults." crumbs={[{ name: 'Methodology', href: '/methodology/' }]} jsonLd={jsonLd}>
+  <div class="wrap">
+    <div class="layout">
+      <article class="prose">
+        <h1>How our rent vs buy calculator works</h1>
+        <p class="meta">Last reviewed 7 November 2026 · RentBuyAtlas Editorial Team</p>
+        <div class="answer-box">
+          <p class="label">Summary</p>
+          <p>The calculator runs a month-by-month simulation of two people with the same income and housing budget: one buys, one rents and invests. It compares their net worth after your chosen stay, after selling costs. Buying wins if the owner’s home equity plus investments exceeds the renter’s investment portfolio.</p>
+        </div>
+
+        <h2 id="principle">The core principle: equal cash, compared fairly</h2>
+        <p>A fair rent vs buy comparison must give both paths the same money. The buyer spends the deposit and buying costs on day one; so the renter is credited with that same amount and invests it. Each month, both pay for housing. Whoever pays less invests the difference at the same expected return. Nothing is double-counted and nothing is left idle.</p>
+
+        <h2 id="buyer">The buying path</h2>
+        <ul>
+          <li><strong>Upfront cash</strong> = deposit (price × deposit %) + buying costs (price × buying-cost %).</li>
+          <li><strong>Mortgage payment</strong> uses the standard amortisation formula: <code>M = L × r / (1 − (1 + r)^−n)</code>, where <code>L</code> is the loan, <code>r</code> the monthly rate (annual rate ÷ 12) and <code>n</code> the number of monthly payments. Each month, interest = balance × r, and the rest of the payment reduces the balance.</li>
+          <li><strong>Recurring costs</strong>: property tax, maintenance and insurance are each a percentage of the <em>current</em> home value, so they rise as the home appreciates. HOA, strata or service charges are a monthly amount that rises with rent inflation.</li>
+          <li><strong>Home value</strong> compounds monthly at the annual appreciation rate.</li>
+          <li><strong>On exit</strong>, the home is sold: equity = value × (1 − selling-cost %) − remaining loan balance.</li>
+        </ul>
+
+        <h2 id="renter">The renting path</h2>
+        <ul>
+          <li>Rent and renter costs (contents insurance, tenant or municipality fees) are paid monthly and increase once a year at the rent-growth rate.</li>
+          <li>The renter’s portfolio starts with the buyer’s upfront cash and compounds monthly at the after-tax investment return.</li>
+          <li>Each month, if owning costs more than renting, the renter invests the difference. If renting costs more, the owner invests the difference in their own portfolio.</li>
+        </ul>
+
+        <h2 id="outputs">Outputs explained</h2>
+        <table>
+          <thead><tr><th>Output</th><th>Definition</th></tr></thead>
+          <tbody>
+            <tr><td>Verdict</td><td>Owner net worth minus renter net worth at the end of your stay, in nominal currency.</td></tr>
+            <tr><td>Break-even year</td><td>The first whole year in which owner net worth ≥ renter net worth, searched over 30 years.</td></tr>
+            <tr><td>Break-even rent</td><td>The starting monthly rent at which both paths finish level at your horizon, found by binary search over the full simulation.</td></tr>
+            <tr><td>Owning cost, month one</td><td>Mortgage payment + tax + maintenance + insurance + fees in the first month.</td></tr>
+            <tr><td>5% rule</td><td>Price × 5% ÷ 12. The personalised version adds your tax, maintenance, insurance and fee percentages to a blended cost of capital: deposit share × (investment return − appreciation) + loan share × (mortgage rate − appreciation).</td></tr>
+            <tr><td>Price-to-rent ratio</td><td>Home price ÷ (monthly rent × 12). Gross rental yield is its inverse.</td></tr>
+          </tbody>
+        </table>
+
+        <h2 id="shared">Shared ownership mode</h2>
+        <p>In the <a href="/shared-ownership-calculator/">shared ownership calculator</a>, you buy a share of the home (for example 25%). The deposit, mortgage and buying costs apply to your share only. You pay rent on the unowned share (default 2.75% of its value per year, rising with rent growth) and, as is typical for UK shared owners, 100% of maintenance and service charges. On exit you receive your share of the sale price minus selling costs. Staircasing is not modelled.</p>
+
+        <h2 id="limits">What the model does not include</h2>
+        <ul>
+          <li><strong>Tax reliefs</strong> such as the US mortgage interest deduction, India’s Section 24 and 80C, or capital gains exemptions on a main home. Where they matter, the country pages explain how to adjust the inputs.</li>
+          <li><strong>Mortgage insurance</strong> (PMI, CMHC, LMI). Add it to the monthly fees field if it applies.</li>
+          <li><strong>Rate resets.</strong> The rate is constant. In markets with short fixed periods, test higher rates to see the risk.</li>
+          <li><strong>Inflation adjustment.</strong> Results are nominal. Comparing the two paths is unaffected, but absolute numbers will look large over long periods.</li>
+          <li><strong>Risk.</strong> A home is a single, leveraged, illiquid asset; a portfolio is diversified and liquid. The model compares expected values, not risk.</li>
+        </ul>
+
+        <h2 id="defaults">Market default assumptions</h2>
+        <p>Defaults describe a typical home in each market as of late 2026. They are compiled from official tax schedules (for example HMRC Stamp Duty bands, the Dubai Land Department fee schedule and state transfer-tax rates), central bank and lender mortgage-rate data, and published average prices and rents. They are rounded and illustrative. Always replace them with numbers for the home you are considering.</p>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>Market</th><th>Rate</th><th>Deposit</th><th>Buy costs</th><th>Sell costs</th><th>Prop. tax</th><th>Maint.</th><th>Home growth</th><th>Rent growth</th><th>Invest return</th></tr></thead>
+            <tbody>
+              {MARKETS.map((m) => (
+                <tr><td>{m.flag} {m.name}</td><td>{pct(m.mortgageRate)}</td><td>{pct(m.downPaymentPct)}</td><td>{pct(m.buyingCostsPct)}</td><td>{pct(m.sellingCostsPct)}</td><td>{pct(m.propertyTaxPct)}</td><td>{pct(m.maintenancePct)}</td><td>{pct(m.appreciationPct)}</td><td>{pct(m.rentGrowthPct)}</td><td>{pct(m.investReturnPct)}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="review">Review and updates</h2>
+        <p>We review market defaults when central banks move rates materially or when governments change property transaction taxes, and at least twice a year. If you spot an outdated figure, please let us know via the <a href="/about/">about page</a>.</p>
+      </article>
+    </div>
+  </div>
+</Base>

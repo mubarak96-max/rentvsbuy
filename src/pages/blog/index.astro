@@ -1,0 +1,26 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostGrid from '../../components/PostGrid.astro';
+import { sortedPosts, blogUrl } from '../../lib/links';
+import { CATEGORIES, categorySlug, SITE } from '../../site';
+
+const posts = await sortedPosts();
+const site = Astro.site!;
+const jsonLd = [{
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Rent vs buy guides',
+  url: new URL('/blog/', site).href,
+  hasPart: posts.map((p) => ({ '@type': 'Article', headline: p.data.h1 ?? p.data.title, url: new URL(blogUrl(p.id), site).href })),
+}];
+---
+<Base title="Rent vs Buy Guides: Costs, Mortgages & Markets" description={`Independent guides on renting vs buying a home: break-even maths, hidden costs, mortgages, the 5% rule and country-by-country analysis from ${SITE.name}.`} crumbs={[{ name: 'Guides', href: '/blog/' }]} jsonLd={jsonLd}>
+  <div class="wrap">
+    <header class="hero" style="padding-top:8px">
+      <h1>Rent vs buy guides</h1>
+      <p class="lede">Clear, numbers-first explanations of the rent-or-buy decision — written for renters and buyers in every major housing market.</p>
+      <p class="meta">{CATEGORIES.map((c) => <a class="cat" href={`/blog/category/${categorySlug(c)}/`}>{c}</a>)}</p>
+    </header>
+    <section class="section" style="padding-top:8px"><PostGrid posts={posts} eager={3} /></section>
+  </div>
+</Base>

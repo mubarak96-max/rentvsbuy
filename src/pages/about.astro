@@ -1,0 +1,35 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../site';
+import { MARKETS } from '../data/markets';
+const jsonLd = [{
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  name: `About ${SITE.name}`,
+  url: new URL('/about/', Astro.site!).href,
+  mainEntity: { '@id': `${Astro.site!.href}#org` },
+}];
+---
+<Base title={`About ${SITE.name}`} description={`${SITE.name} is an independent, free rent vs buy calculator and guide for ${MARKETS.length} housing markets worldwide. Learn who we are and how we work.`} crumbs={[{ name: 'About', href: '/about/' }]} jsonLd={jsonLd}>
+  <div class="wrap">
+    <div class="layout">
+      <article class="prose">
+        <h1>About {SITE.name}</h1>
+        <p class="lede">We help people answer one of the biggest money questions of their lives — rent or buy? — with honest numbers for the market they actually live in.</p>
+        <h2>Why we built this</h2>
+        <p>Most rent vs buy calculators are built for a single country, usually the United States, and quietly assume its taxes, fees and mortgage rules. That leaves renters and buyers in London, Dubai, Toronto, Sydney, Mumbai, Singapore or Berlin plugging in numbers that do not fit. {SITE.name} starts from local defaults for {MARKETS.length} markets and lets you change every assumption.</p>
+        <h2>Our principles</h2>
+        <ul>
+          <li><strong>Neutral.</strong> We do not sell mortgages, list properties or earn commission from either outcome. The calculator is as happy to tell you to rent as to buy.</li>
+          <li><strong>Transparent.</strong> Every formula is published on our <a href="/methodology/">methodology page</a>. No black boxes.</li>
+          <li><strong>Sourced.</strong> Market defaults and articles are based on official sources such as tax authorities, land departments, central banks and national statistics offices, and we cite them in our guides.</li>
+          <li><strong>Private.</strong> The calculator runs entirely in your browser. We do not ask for your email and do not store what you enter.</li>
+        </ul>
+        <h2>Editorial process</h2>
+        <p>Guides are written and reviewed by the {SITE.author}, checked against primary sources, and dated. We update market defaults and affected articles when interest rates or property taxes change materially, and review every page at least twice a year.</p>
+        <h2>Not financial advice</h2>
+        <p>Our tools and guides are educational. Housing decisions involve personal, tax and legal factors we cannot see. Consider speaking with a qualified adviser, mortgage broker or lawyer in your country before you commit.</p>
+      </article>
+    </div>
+  </div>
+</Base>

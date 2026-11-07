@@ -1,11 +1,155 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import Base from '../layouts/Base.astro';
+import Calculator from '../components/Calculator.tsx';
+import Faq from '../components/Faq.astro';
+import MarketTable from '../components/MarketTable.astro';
+import PostGrid from '../components/PostGrid.astro';
+import { toolLinks, sortedPosts } from '../lib/links';
+import { MARKETS } from '../data/markets';
+import { SITE } from '../site';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const tools = await toolLinks();
+const countries = tools.filter((t) => t.isCountry);
+const intents = tools.filter((t) => !t.isCountry);
+const marketFlag = Object.fromEntries(MARKETS.map((m) => [m.id, m.flag]));
+const posts = await sortedPosts();
+const featured = ['is-it-better-to-rent-or-buy-a-house', 'renting-vs-buying-a-home', 'should-i-rent-or-buy', '5-percent-rule-rent-vs-buy', 'rent-vs-buy-break-even-point', 'is-a-mortgage-cheaper-than-rent']
+  .map((id) => posts.find((p) => p.id === id))
+  .filter((p): p is NonNullable<typeof p> => Boolean(p));
+const featuredPosts = featured.length >= 3 ? featured : posts.slice(0, 6);
+
+const faqs = [
+  { q: 'Is it better to rent or buy a house?', a: 'It depends on how long you will stay, the price-to-rent ratio in your area, mortgage rates and what your savings would earn if invested. Buying usually wins if you stay long enough to recover transaction costs (often 4–10 years) and comparable rent is above the break-even rent shown by the calculator. Renting usually wins for short stays, in expensive cities with low rental yields, or when mortgage rates are high relative to rents.' },
+  { q: 'How does this rent vs buy calculator work?', a: 'It simulates every month of your stay. The buyer pays the deposit, buying costs, mortgage, property tax, maintenance, insurance and fees, while the home appreciates. The renter pays rent and invests the deposit and any monthly savings. At the end, the home is sold (minus selling costs) and the two net worths are compared. The result is the gap, the break-even year and the break-even rent.' },
+  { q: 'What is the break-even rent?', a: 'Break-even rent is the monthly rent at which renting and buying leave you equally wealthy after the number of years you choose. If you can rent a comparable home for less than this figure, renting comes out ahead; if comparable rent is higher, buying comes out ahead. It is the single most useful number for comparing a listing with a rental.' },
+  { q: 'Which countries does the calculator cover?', a: `It includes ${MARKETS.length} presets: the United States, United Kingdom, Canada, Australia, UAE (Dubai), India, Singapore, Germany, France, Spain, Ireland, New Zealand, the Netherlands, Switzerland, Japan, Hong Kong, South Africa, Saudi Arabia, Italy, Portugal, Sweden, Mexico and Brazil, plus New York City, London, Toronto and Sydney. Each preset loads local currency and typical taxes, fees and rates, and every value can be edited.` },
+  { q: 'Is a mortgage payment cheaper than rent?', a: 'Sometimes the monthly mortgage payment is lower than rent, but that comparison is misleading. Owners also pay property tax, maintenance, insurance and fees, plus large one-off buying and selling costs, and they give up the investment return on their deposit. Part of each mortgage payment is principal, which you keep as equity. The calculator accounts for all of these.' },
+  { q: 'What is the 5% rule for renting vs buying?', a: 'The 5% rule estimates the yearly unrecoverable cost of owning as 5% of the home’s value: about 1% property tax, 1% maintenance and 3% cost of capital. Divide by 12 and compare with monthly rent. If rent is lower, renting is likely cheaper. The calculator shows both the classic 5% figure and a personalised percentage built from your own inputs.' },
+];
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'Rent vs Buy Calculator',
+    url: Astro.site!.href,
+    description: SITE.description,
+    applicationCategory: 'FinanceApplication',
+    operatingSystem: 'Any (web browser)',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    featureList: ['27 housing market presets', 'Break-even year', 'Break-even rent', '5% rule check', 'Opportunity cost of deposit', 'Shared ownership mode', 'Shareable results link'],
+    publisher: { '@id': `${Astro.site!.href}#org` },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  },
+];
 ---
+<Base title="Rent vs Buy Calculator: Should You Rent or Buy? (27 Markets)" description="Free rent vs buy calculator for the US, UK, Canada, Australia, UAE, India and 21 more markets. Local costs, break-even year, break-even rent and the 5% rule." jsonLd={jsonLd}>
+  <div class="wrap">
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <h1>Rent vs Buy Calculator</h1>
+          <p class="lede">Should you rent or buy? Pick your market, adjust the numbers, and see which choice leaves you wealthier — including the year buying breaks even and the rent at which renting wins.</p>
+          <ul class="trust">
+            <li>Local taxes, fees &amp; rates</li>
+            <li>Opportunity cost included</li>
+            <li>Break-even rent</li>
+            <li>Shareable results</li>
+          </ul>
+        </div>
+        <div class="hero-img">
+          <img src="/images/hero.webp" alt="Illustration of a globe with homes and apartments, balanced on a scale between a house key and a rental lease" width="1600" height="1100" fetchpriority="high" />
+        </div>
+      </div>
+    </section>
 
-<Layout>
-	<Welcome />
-</Layout>
+    <section class="calc-section" id="calculator" aria-label="Rent vs buy calculator">
+      <Calculator client:load market="us" />
+    </section>
+
+    <div class="layout" style="padding-bottom:20px">
+      <article class="prose">
+        <div class="answer-box">
+          <p class="label">Quick answer</p>
+          <p>Buying beats renting when you stay long enough to recover buying and selling costs and comparable rent is higher than the <strong>break-even rent</strong>. Renting wins for shorter stays, in high price-to-rent markets, or when mortgage rates are high and you invest the money you would have put into a deposit. Most people need <strong>4 to 10 years</strong> for buying to pay off.</p>
+        </div>
+
+        <h2 id="how-it-works">How the rent vs buy calculator works</h2>
+        <p>Most rent vs buy comparisons stop at one question: is the mortgage payment lower than the rent? That is the wrong test. A fair <strong>rent vs buy calculator</strong> compares two complete financial paths over the same period and asks which one leaves you with more wealth at the end. That is exactly what this tool does.</p>
+        <p>The calculator simulates every month of your stay. On the <strong>buying path</strong>, you pay a down payment (deposit) and one-off buying costs such as stamp duty, transfer tax, legal and lender fees. Each month you pay the mortgage, property tax, maintenance, insurance and any HOA, strata or service charges. Your home grows in value at the appreciation rate you choose, and when you leave, it is sold and selling costs are deducted.</p>
+        <p>On the <strong>renting path</strong>, you pay rent (which rises each year) plus renter costs like contents insurance. Crucially, the renter does not leave the deposit sitting idle: it is invested on day one, and every month that renting is cheaper than owning, the difference is invested too. If owning becomes cheaper later — because rents rise while your mortgage stays fixed — the owner invests the difference instead. This is how the calculator accounts for <a href="/blog/opportunity-cost-of-a-down-payment/">the opportunity cost of a down payment</a>.</p>
+        <p>The result is two net-worth lines. Where the buying line crosses above the renting line is your <strong>break-even year</strong>. The full assumptions and formulas are documented on our <a href="/methodology/">methodology page</a>.</p>
+
+        <h2 id="how-to-use">How to use it in five steps</h2>
+        <ol>
+          <li><strong>Choose your market.</strong> Selecting a country or city loads its currency and typical costs — for example the 4% Dubai Land Department fee in the UAE, Stamp Duty in the UK, or high property taxes in parts of the US.</li>
+          <li><strong>Set how long you will stay.</strong> This is the most important input. Transaction costs are paid once, so the longer you stay, the more years you have to spread them over.</li>
+          <li><strong>Enter a real price and a real rent.</strong> Use a home you would actually buy and the rent for a genuinely comparable home — same size, area and quality.</li>
+          <li><strong>Check the mortgage rate and deposit.</strong> Use a rate you can actually get today, not the best advertised rate.</li>
+          <li><strong>Stress-test the growth assumptions.</strong> Try home price growth one point lower and the investment return one point higher. If the verdict flips, the decision is close and non-financial factors should decide it.</li>
+        </ol>
+
+        <h2 id="reading-results">How to read your results</h2>
+        <p><strong>The verdict</strong> shows which path leaves you wealthier after your chosen number of years, and by how much, in today’s currency units (not adjusted for inflation). <strong>Break-even year</strong> is the first year in which buying overtakes renting. If it says 30+ years, renting wins on these assumptions for any realistic stay.</p>
+        <p><strong>Break-even rent</strong> is the most practical number on the page. It is the monthly rent at which the two paths finish level. If you can rent a comparable home for less, rent. If comparable homes rent for more, buying is likely the better deal. It turns a complex model into a figure you can compare directly with listings.</p>
+        <p>The <strong>5% rule check</strong> gives a quick sanity test popularised by Canadian portfolio manager Ben Felix: multiply the home price by 5% and divide by 12 to estimate the monthly unrecoverable cost of owning. The calculator also shows a personalised percentage based on your tax, maintenance, rate and return inputs. Learn more in our guide to <a href="/blog/5-percent-rule-rent-vs-buy/">the 5% rule</a>.</p>
+        <p>The <strong>price-to-rent ratio</strong> divides the home price by a year of rent. Ratios above roughly 20 usually lean towards renting, and below roughly 15 lean towards buying, though local rates and costs matter. See <a href="/blog/price-to-rent-ratio/">what the price-to-rent ratio tells you</a>.</p>
+
+        <h2 id="key-factors">The factors that decide rent vs buy</h2>
+        <table>
+          <thead><tr><th>Factor</th><th>Favours buying when…</th><th>Favours renting when…</th></tr></thead>
+          <tbody>
+            <tr><td>Time in the home</td><td>You stay 7+ years</td><td>You may move within 3–5 years</td></tr>
+            <tr><td>Price-to-rent ratio</td><td>Below ~15 (high rental yields)</td><td>Above ~20 (low rental yields)</td></tr>
+            <tr><td>Mortgage rate</td><td>Low relative to rental yield and expected growth</td><td>High relative to rental yield</td></tr>
+            <tr><td>Transaction costs</td><td>Low (e.g. New Zealand, Ireland)</td><td>High (e.g. Germany, Spain, Dubai, India)</td></tr>
+            <tr><td>Investment discipline</td><td>You would not invest the difference</td><td>You reliably invest your savings</td></tr>
+            <tr><td>Rent growth</td><td>Rents rise fast while your payment is fixed</td><td>Rents are controlled or flat</td></tr>
+          </tbody>
+        </table>
+        <p>No single factor decides it. A city with a high price-to-rent ratio can still favour buying if you stay 20 years, and a cheap market can favour renting if transaction costs are steep and you move often. That is why running the full model matters more than any rule of thumb.</p>
+
+        <h2 id="markets">Rent vs buy across the world’s top markets</h2>
+        <p>The table below runs the calculator with the default assumptions for every market over a 10-year stay. It shows how differently the rent-or-buy question plays out around the world — from Dubai, where high rental yields favour buying, to cities like Toronto, Sydney and New York, where low yields often favour renting and investing.</p>
+      </article>
+      <aside class="aside">
+        <div class="card">
+          <h2>Calculators by country</h2>
+          <ul>{countries.map((t) => <li><a href={t.href}>{marketFlag[t.market]} {t.title}</a></li>)}</ul>
+        </div>
+        <div class="card">
+          <h2>Calculators by goal</h2>
+          <ul>{intents.map((t) => <li><a href={t.href}>{t.title}</a></li>)}</ul>
+        </div>
+      </aside>
+    </div>
+
+    <section aria-labelledby="markets"><MarketTable /></section>
+
+    <div class="layout" style="padding:20px 0">
+      <article class="prose">
+        <h2 id="mistakes">Common mistakes when comparing renting and buying</h2>
+        <ul>
+          <li><strong>Comparing rent with the mortgage payment only.</strong> Property tax, maintenance, insurance and service charges often add 30–60% on top of the payment. Our guide <a href="/blog/is-a-mortgage-cheaper-than-rent/">Is a mortgage cheaper than rent?</a> explains why.</li>
+          <li><strong>Treating all of rent as “dead money” and all of a mortgage as savings.</strong> Interest, taxes and maintenance are just as unrecoverable as rent. Only principal repayment builds equity.</li>
+          <li><strong>Forgetting transaction costs.</strong> Buying and then selling can cost 6–15% of the price in many markets. Leave after two years and these costs alone can wipe out any gains.</li>
+          <li><strong>Assuming prices always rise.</strong> Real home prices have fallen for a decade or more in some markets. Try a lower appreciation rate to see how sensitive your result is.</li>
+          <li><strong>Ignoring what the deposit could earn.</strong> A large deposit invested in a diversified portfolio has a real opportunity cost, especially in markets with high interest rates.</li>
+        </ul>
+
+        <h2 id="beyond-money">When the numbers are close</h2>
+        <p>If the calculator shows a small gap either way, the financial case is roughly a tie — and that is useful to know. Then the decision rests on things the model cannot price: the stability of owning your home and being able to renovate it, versus the flexibility of renting and the freedom from repair bills. Read <a href="/blog/owning-a-home-vs-renting/">owning a home vs renting: the full pros and cons</a> or our flagship guide, <a href="/blog/is-it-better-to-rent-or-buy-a-house/">is it better to rent or buy a house?</a></p>
+        <Faq faqs={faqs} />
+      </article>
+    </div>
+
+    <section class="section">
+      <div class="section-head"><h2>Rent vs buy guides</h2><a href="/blog/">All 30 guides →</a></div>
+      <PostGrid posts={featuredPosts} />
+    </section>
+  </div>
+</Base>

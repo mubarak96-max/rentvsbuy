@@ -1,0 +1,178 @@
+---
+import '../styles/global.css';
+import { SITE } from '../site';
+
+interface Crumb { name: string; href: string }
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  type?: 'website' | 'article';
+  jsonLd?: Record<string, unknown>[];
+  crumbs?: Crumb[];
+  noindex?: boolean;
+  publishedTime?: Date;
+  modifiedTime?: Date;
+}
+
+const { title, description, image = SITE.ogImage, type = 'website', jsonLd = [], crumbs, noindex = false, publishedTime, modifiedTime } = Astro.props;
+const site = Astro.site ?? new URL(SITE.url);
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImage = new URL(image, site).href;
+const fullTitle = title.includes(SITE.name) ? title : `${title} | ${SITE.name}`;
+const path = Astro.url.pathname;
+
+const orgLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': `${site.href}#org`,
+  name: SITE.name,
+  url: site.href,
+  logo: new URL('/favicon.svg', site).href,
+  description: SITE.description,
+};
+const siteLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': `${site.href}#website`,
+  name: SITE.name,
+  url: site.href,
+  publisher: { '@id': `${site.href}#org` },
+  inLanguage: 'en',
+};
+const crumbLd = crumbs && crumbs.length
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [{ name: 'Home', href: '/' }, ...crumbs].map((c, i) => ({
+        '@type': 'ListItem', position: i + 1, name: c.name, item: new URL(c.href, site).href,
+      })),
+    }
+  : null;
+const allLd = [orgLd, siteLd, ...(crumbLd ? [crumbLd] : []), ...jsonLd];
+
+const nav = [
+  { href: '/rent-vs-buy-calculator/', label: 'Countries' },
+  { href: '/rent-vs-mortgage-calculator/', label: 'Rent vs Mortgage' },
+  { href: '/shared-ownership-calculator/', label: 'Shared Ownership' },
+  { href: '/blog/', label: 'Guides' },
+  { href: '/methodology/', label: 'Methodology' },
+];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex, follow" /> : <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#1877f2" />
+    <link rel="alternate" type="application/rss+xml" title={`${SITE.name} guides`} href="/rss.xml" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    {publishedTime && <meta property="article:published_time" content={publishedTime.toISOString()} />}
+    {modifiedTime && <meta property="article:modified_time" content={modifiedTime.toISOString()} />}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;600;700&display=swap" />
+    {allLd.map((ld) => <script type="application/ld+json" set:html={JSON.stringify(ld)} />)}
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="/" aria-label={`${SITE.name} home`}>
+          <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#1877f2"/><path d="M7 16.5 16 9l9 7.5" stroke="#ffffff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 15v8h12v-8" stroke="#ffffff" stroke-width="2.4" fill="none" stroke-linejoin="round"/><circle cx="16" cy="19" r="2.2" fill="#e8a33d"/></svg>
+          RentBuy
+        </a>
+        <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+        <nav id="site-nav" class="nav" aria-label="Main">
+          {nav.map((n) => <a href={n.href} aria-current={path.startsWith(n.href) ? 'page' : undefined}>{n.label}</a>)}
+          <a class="cta" href="/#calculator">Calculator</a>
+        </nav>
+      </div>
+    </header>
+    <main id="main">
+      {crumbs && crumbs.length > 0 && (
+        <div class="wrap">
+          <nav class="crumbs" aria-label="Breadcrumb">
+            <ol>
+              <li><a href="/">Home</a></li>
+              {crumbs.map((c, i) => <li>{i === crumbs.length - 1 ? <span aria-current="page">{c.name}</span> : <a href={c.href}>{c.name}</a>}</li>)}
+            </ol>
+          </nav>
+        </div>
+      )}
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="wrap">
+        <div class="footer-grid">
+          <div>
+            <h2>{SITE.name}</h2>
+            <p style="margin:0;color:var(--ink-2)">{SITE.tagline}. Independent, free, and built for renters and buyers in 27 markets.</p>
+          </div>
+          <div>
+            <h2>Calculators</h2>
+            <ul>
+              <li><a href="/">Rent vs buy calculator</a></li>
+              <li><a href="/rent-vs-own-calculator/">Rent vs own calculator</a></li>
+              <li><a href="/rent-vs-mortgage-calculator/">Rent vs mortgage calculator</a></li>
+              <li><a href="/rent-to-buy-calculator/">Rent to buy calculator</a></li>
+              <li><a href="/shared-ownership-calculator/">Shared ownership calculator</a></li>
+              <li><a href="/rent-and-invest-vs-buy-calculator/">Rent and invest vs buy</a></li>
+              <li><a href="/5-percent-rule-calculator/">5% rule calculator</a></li>
+              <li><a href="/rent-vs-buy-house-calculator/">Rent vs buy house</a></li>
+              <li><a href="/rent-vs-buy-condo-calculator/">Rent vs buy condo</a></li>
+            </ul>
+          </div>
+          <div>
+            <h2>Countries</h2>
+            <ul>
+              <li><a href="/rent-vs-buy-calculator/united-states/">United States</a></li>
+              <li><a href="/rent-vs-buy-calculator/united-kingdom/">United Kingdom</a></li>
+              <li><a href="/rent-vs-buy-calculator/canada/">Canada</a></li>
+              <li><a href="/rent-vs-buy-calculator/australia/">Australia</a></li>
+              <li><a href="/rent-vs-buy-calculator/uae/">UAE (Dubai)</a></li>
+              <li><a href="/rent-vs-buy-calculator/india/">India</a></li>
+              <li><a href="/rent-vs-buy-calculator/">All countries →</a></li>
+            </ul>
+          </div>
+          <div>
+            <h2>Learn</h2>
+            <ul>
+              <li><a href="/blog/is-it-better-to-rent-or-buy-a-house/">Is it better to rent or buy?</a></li>
+              <li><a href="/blog/5-percent-rule-rent-vs-buy/">The 5% rule</a></li>
+              <li><a href="/blog/price-to-rent-ratio/">Price-to-rent ratio</a></li>
+              <li><a href="/blog/">All guides</a></li>
+              <li><a href="/methodology/">Methodology</a></li>
+              <li><a href="/about/">About</a></li>
+              <li><a href="/privacy/">Privacy &amp; disclaimer</a></li>
+            </ul>
+          </div>
+        </div>
+        <p class="fineprint">© {new Date().getFullYear()} {SITE.name}. Calculators and articles are for education only and are not financial, tax or legal advice. Default assumptions are illustrative estimates for late 2026; check current rates, taxes and fees with local professionals.</p>
+      </div>
+    </footer>
+    <script>
+      const btn = document.querySelector('.menu-btn');
+      const navEl = document.getElementById('site-nav');
+      btn?.addEventListener('click', () => {
+        const open = navEl?.classList.toggle('open');
+        btn.setAttribute('aria-expanded', String(!!open));
+      });
+    </script>
+  </body>
+</html>

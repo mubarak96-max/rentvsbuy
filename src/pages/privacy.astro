@@ -1,0 +1,22 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../site';
+---
+<Base title="Privacy Policy & Disclaimer" description={`How ${SITE.name} handles your data (the calculator runs in your browser) and the limits of our calculators and guides.`} crumbs={[{ name: 'Privacy & disclaimer', href: '/privacy/' }]}>
+  <div class="wrap">
+    <div class="layout">
+      <article class="prose">
+        <h1>Privacy policy &amp; disclaimer</h1>
+        <p class="meta">Last updated 7 November 2026</p>
+        <h2>Your calculator inputs</h2>
+        <p>The {SITE.name} calculator runs entirely in your web browser. The numbers you enter are not sent to or stored on our servers. If you use “Copy shareable link”, your inputs are written into the page address so you can share them; anyone with the link can see those numbers.</p>
+        <h2>Analytics and cookies</h2>
+        <p>We may use privacy-friendly, aggregated analytics to understand which pages are useful. We do not sell personal data. Fonts are loaded from Google Fonts, which may receive your IP address as part of a normal web request.</p>
+        <h2>Disclaimer</h2>
+        <p>Content on this website is for general education only and is not financial, investment, tax or legal advice. Default assumptions are illustrative estimates and may be out of date. Results depend entirely on the assumptions you choose, and future house prices, rents, interest rates and investment returns are uncertain. Always verify figures and seek professional advice before making a housing decision.</p>
+        <h2>Contact</h2>
+        <p>Questions or corrections are welcome. See the <a href="/about/">about page</a>.</p>
+      </article>
+    </div>
+  </div>
+</Base>

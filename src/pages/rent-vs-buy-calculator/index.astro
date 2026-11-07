@@ -1,0 +1,78 @@
+---
+import Base from '../../layouts/Base.astro';
+import Calculator from '../../components/Calculator.tsx';
+import MarketTable from '../../components/MarketTable.astro';
+import Faq from '../../components/Faq.astro';
+import { toolLinks } from '../../lib/links';
+import { MARKETS, getMarket } from '../../data/markets';
+
+const tools = await toolLinks();
+const countries = tools.filter((t) => t.isCountry);
+const site = Astro.site!;
+const faqs = [
+  { q: 'Why does the rent vs buy answer differ by country?', a: 'Four things change most between countries: transaction costs (from about 1% in New Zealand to over 10% in Germany and Spain), recurring owner taxes, mortgage rates and structure (fixed for 30 years in the US and France, variable or short fixed periods in the UK, Canada and Australia), and the price-to-rent ratio. Each shifts the break-even point by years.' },
+  { q: 'Can I use the calculator for a country that is not listed?', a: 'Yes. Pick the closest market, then overwrite every input with local figures: price, rent, mortgage rate and term, deposit, property tax, buying and selling costs, maintenance, insurance and growth rates. The currency label is cosmetic; the maths works in any currency.' },
+  { q: 'How accurate are the default assumptions?', a: 'Defaults are illustrative late-2026 estimates for a typical home in each market, drawn from official tax schedules, central bank and lender rate data and published price and rent averages. They are a starting point, not a quote. Your city, property type and credit profile can change every input.' },
+];
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Rent vs buy calculator by country',
+    url: new URL('/rent-vs-buy-calculator/', site).href,
+    hasPart: countries.map((c) => ({ '@type': 'WebApplication', name: c.title, url: new URL(c.href, site).href, applicationCategory: 'FinanceApplication', operatingSystem: 'Any' })),
+  },
+  { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
+];
+---
+<Base title="Rent vs Buy Calculator by Country (2026): 27 Markets" description="Compare renting vs buying in the US, UK, Canada, Australia, UAE, India, Singapore, Germany and more, with local taxes, fees, rates and break-even rent." crumbs={[{ name: 'Rent vs buy by country', href: '/rent-vs-buy-calculator/' }]} jsonLd={jsonLd}>
+  <div class="wrap">
+    <header class="hero" style="padding-top:8px">
+      <div class="hero-grid">
+        <div>
+          <span class="eyebrow">{MARKETS.length} markets · local currencies</span>
+          <h1>Rent vs buy calculator by country</h1>
+          <p class="lede">The rent-or-buy answer depends on where you live. Each country calculator loads local stamp duty or transfer taxes, typical mortgage rates, property taxes and rents — then lets you change everything.</p>
+        </div>
+        <div class="hero-img"><img src="/images/calculator-hub.webp" alt="Illustration of a calculator combined with a house and a globe" width="1200" height="675" /></div>
+      </div>
+    </header>
+
+    <section class="section" style="padding-top:0">
+      <h2 style="margin-top:0">Choose your country</h2>
+      <div class="grid-cards">
+        {countries.map((c) => {
+          const m = getMarket(c.market);
+          return (
+            <a class="tile flag-tile" href={c.href}>
+              <span class="flag" aria-hidden="true">{m.flag}</span>
+              <span><span class="t-title">{m.name}</span><br /><span class="t-desc">{m.currency} · rate {m.mortgageRate}% · buying costs ~{m.buyingCostsPct}%</span></span>
+            </a>
+          );
+        })}
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 style="margin-top:0">How 27 markets compare over 10 years</h2>
+      <MarketTable />
+    </section>
+
+    <section class="calc-section" aria-label="Calculator">
+      <h2>Try any market</h2>
+      <Calculator client:visible market="uk" />
+    </section>
+
+    <div class="layout">
+      <article class="prose">
+        <h2>What changes from country to country</h2>
+        <p><strong>Transaction costs</strong> are the biggest driver of how long you need to stay. Buying costs range from roughly 1% of the price in New Zealand, which has no stamp duty, to 7% in Dubai (4% land department fee plus agent and mortgage fees) and around 10–12% in Germany and Spain once transfer tax, notary and agent fees are included. Higher upfront costs push the break-even year further out.</p>
+        <p><strong>Mortgage structure</strong> varies too. Americans and the French can fix a rate for the full term; UK, Canadian, Irish and Australian borrowers usually refinance every few years, so rate risk continues long after purchase. In Hong Kong and much of Asia, payments float with interbank rates.</p>
+        <p><strong>Recurring owner costs</strong> differ widely. US property taxes can exceed 2% a year in some states, while UK council tax is paid by renters and owners alike, so it does not affect the comparison. Condo, strata and service charges are significant in Dubai, Singapore, New York and Toronto.</p>
+        <p><strong>Price-to-rent ratios</strong> set the starting point. Where rents are high relative to prices — gross yields of 6% or more — buying tends to win quickly. Where yields are 3% or below, as in many Indian metros, Toronto and Sydney, renting and investing the difference often wins unless prices keep rising strongly.</p>
+        <p>For a deeper look, read <a href="/blog/rent-vs-buy-around-the-world/">rent vs buy around the world</a> or the city guides for <a href="/blog/rent-vs-buy-dubai/">Dubai</a> and <a href="/blog/rent-vs-buy-uk/">the UK</a>.</p>
+        <Faq faqs={faqs} />
+      </article>
+    </div>
+  </div>
+</Base>
