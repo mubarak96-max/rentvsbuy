@@ -17,7 +17,7 @@ faqs:
   - q: "Is the New York Times rent vs buy calculator accurate?"
     a: "It is widely regarded as one of the most thorough US calculators, because it models opportunity cost, transaction costs and taxes, and expresses the answer as an equivalent monthly rent. Its accuracy depends on your inputs, especially home price growth and investment return. Access may depend on your New York Times subscription status, and its tax logic is US-specific."
   - q: "Which rent vs buy calculator is best outside the United States?"
-    a: "Choose one built around your market's costs. US calculators assume US-style property tax, closing costs, mortgage interest deductions and the $250,000/$500,000 home-sale exclusion, which do not apply elsewhere. RentBuyAtlas has presets for 27 countries and cities with local currencies, transfer taxes, service charges and typical rates, all editable."
+    a: "Choose one built around your market's costs. US calculators assume US-style property tax, closing costs, mortgage interest deductions and the $250,000/$500,000 home-sale exclusion, which do not apply elsewhere. RentBuyAtlas has presets for countries and cities worldwide with local currencies, transfer taxes, service charges and typical rates, all editable."
   - q: "Why do different rent vs buy calculators give different answers?"
     a: "Mostly because of default assumptions. Fidelity's tool, for example, assumes 7% selling costs and 2.5% rent growth, while others let you set them. Calculators also differ on whether they include opportunity cost, taxes, mortgage insurance and inflation. Enter the same assumptions in two tools and the verdicts usually converge."
   - q: "Does Zillow have a rent vs buy calculator?"
@@ -90,7 +90,7 @@ People often search for a realtor.com or Trulia rent vs buy calculator. Trulia l
 
 ### RentBuyAtlas
 
-Our [rent vs buy calculator](/rent-vs-buy-calculator/) runs a month-by-month simulation for any horizon from 1 to 30 years. It starts from local defaults for 27 countries and cities, in local currency, including transfer taxes and fees (for example, the 4% Dubai Land Department fee, German Kaufnebenkosten, or Spanish ITP), service charges and typical mortgage terms. Every input is editable.
+Our [rent vs buy calculator](/rent-vs-buy-calculator/) runs a month-by-month simulation for any horizon from 1 to 30 years. It starts from local defaults for countries and cities worldwide, in local currency, including transfer taxes and fees (for example, the 4% Dubai Land Department fee, German Kaufnebenkosten, or Spanish ITP), service charges and typical mortgage terms. Every input is editable.
 
 Outputs include net worth of buyer and renter each year, a **break-even year**, a **break-even rent**, monthly payment, total unrecoverable costs and a [5% rule check](/5-percent-rule-calculator/). A [shared ownership mode](/shared-ownership-calculator/) handles the UK part-buy, part-rent scheme, and every result can be shared by URL.
 
@@ -107,7 +107,7 @@ Its limits: it does not model tax deductions, mortgage insurance or rate resets,
 | Choose horizon | Yes | 1–30 years | Not confirmed | Yes | Yes | 1–30 years |
 | Break-even output | Equivalent rent | Break-even year | Breakeven horizon | Winner + wealth | Break-even year | Year + rent |
 | Tax modelling | US | US federal | Not confirmed | US federal | US federal, state, local | None (noted per market) |
-| Countries | US | US | US | US | US | 27 markets |
+| Countries | US | US | US | US | US | Global |
 | Currencies | USD | USD | USD | USD | USD | Local |
 | All assumptions editable | Most | Most | Not confirmed | Few | Most | All |
 | Shareable result link | Not confirmed | Not confirmed | Not confirmed | No session kept | Not confirmed | Yes |

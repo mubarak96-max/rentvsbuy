@@ -25,7 +25,7 @@ const jsonLd = [
   { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
 ];
 ---
-<Base title="Rent vs Buy Calculator by Country (2026): 27 Markets" description="Compare renting vs buying in the US, UK, Canada, Australia, UAE, India, Singapore, Germany and more, with local taxes, fees, rates and break-even rent." crumbs={[{ name: 'Rent vs buy by country', href: '/rent-vs-buy-calculator/' }]} jsonLd={jsonLd}>
+<Base title="Rent vs Buy Calculator by Country (2026)" description="Compare renting vs buying in the US, UK, Canada, Australia, UAE, India, Singapore, Germany and more, with local taxes, fees, rates and break-even rent." crumbs={[{ name: 'Rent vs buy by country', href: '/rent-vs-buy-calculator/' }]} jsonLd={jsonLd}>
   <div class="wrap">
     <header class="hero" style="padding-top:8px">
       <div class="hero-grid">
@@ -54,7 +54,7 @@ const jsonLd = [
     </section>
 
     <section class="section">
-      <h2 style="margin-top:0">How 27 markets compare over 10 years</h2>
+      <h2 style="margin-top:0">How markets compare over 10 years</h2>
       <MarketTable />
     </section>
 

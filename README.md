@@ -8,7 +8,7 @@ Astro + React. 62 static pages: homepage calculator, 20 calculator landing pages
 - `node scripts/qa.mjs` — after a build: word counts, meta lengths, broken internal links
 
 ## Where things live
-- `src/data/markets.ts` — 27 market default assumptions (rates, taxes, fees). Review regularly.
+- `src/data/markets.ts` — Market default assumptions (rates, taxes, fees). Review regularly.
 - `src/lib/calc.ts` — rent vs buy engine (monthly simulation, break-even rent, 5% rule)
 - `src/components/Calculator.tsx` — the interactive calculator (SSR + hydrated)
 - `src/content/tools/` — calculator landing pages (Markdown, rendered below the calculator)

@@ -1,6 +1,6 @@
 ---
-title: "Price-to-Rent Ratio: Formula, Benchmarks and 27 Markets"
-description: "The price to rent ratio compares home prices with annual rent. Learn the formula, how to read it, its link to gross rental yield, and ratios for 27 markets."
+title: "Price-to-Rent Ratio: Formula, Benchmarks and Ratios by Market"
+description: "The price to rent ratio compares home prices with annual rent. Learn the formula, how to read it, its link to gross rental yield, and ratios by market."
 h1: "Price-to-Rent Ratio: How to Calculate It and What It Tells You"
 primaryKeyword: "price to rent ratio"
 keywords: ["rent vs buy ratio", "rent vs own ratio", "rent prices vs house prices", "gross rental yield", "price to rent ratio formula", "price to rent ratio by country"]
@@ -64,7 +64,7 @@ A widely used rule of thumb, popularised in the US, divides ratios into rough ba
 
 Treat these as approximate. They were designed with typical US mortgage rates and property taxes in mind. The fairer test is whether the rent you save by owning, the gross yield, covers the true cost of owning: mortgage interest, the return you give up on your deposit, property tax, maintenance, insurance and fees, minus expected price growth. That is the logic behind the [5% rule](/blog/5-percent-rule-rent-vs-buy/), which you can personalise with the [5% rule calculator](/5-percent-rule-calculator/).
 
-## Price-to-rent ratios in our 27 market defaults
+## Price-to-rent ratios in our market defaults
 
 Below are the ratios implied by the default home price and monthly rent in our calculator for each market, sorted from lowest to highest. The final column shows which side wins after ten years using all of that market's defaults (rates, taxes, costs and growth), with the renter investing the difference.
 

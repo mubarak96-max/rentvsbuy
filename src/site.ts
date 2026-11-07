@@ -4,7 +4,7 @@ export const SITE = {
   url: (import.meta.env.SITE_URL as string | undefined) ?? 'https://rentbuyatlas.com',
   tagline: 'The global rent vs buy calculator',
   description:
-    'Free rent vs buy calculator for 27 of the world’s top housing markets. Local taxes, transaction costs and rates, with break-even year, break-even rent and the 5% rule.',
+    'Free rent vs buy calculator for the world’s top housing markets. Local taxes, transaction costs and rates, with break-even year, break-even rent and the 5% rule.',
   author: 'RentBuyAtlas Editorial Team',
   locale: 'en',
   ogImage: '/images/og-default.png',

@@ -64,7 +64,7 @@ Three forces explain the differences:
 - **Leverage and deposit size.** The UK default uses a 10% deposit. A small deposit means the renter has less money to invest, so a high rate hurts the buyer but the renter's head start is also small.
 - **Investment return assumptions.** The US default assumes a 7% return for renters, the UK 6% and Dubai 6%. A high return for the renter amplifies the effect of high mortgage rates.
 
-The [rent vs buy around the world](/blog/rent-vs-buy-around-the-world/) comparison shows this pattern across 27 markets: the gap between rental yield and mortgage rate predicts most verdicts.
+The [rent vs buy around the world](/blog/rent-vs-buy-around-the-world/) comparison shows this pattern across markets: the gap between rental yield and mortgage rate predicts most verdicts.
 
 ## Should I buy when interest rates are high?
 

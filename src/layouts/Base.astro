@@ -52,7 +52,6 @@ const crumbLd = crumbs && crumbs.length
 const allLd = [orgLd, siteLd, ...(crumbLd ? [crumbLd] : []), ...jsonLd];
 
 const nav = [
-  { href: '/rent-vs-buy-calculator/', label: 'Countries' },
   { href: '/rent-vs-mortgage-calculator/', label: 'Rent vs Mortgage' },
   { href: '/shared-ownership-calculator/', label: 'Shared Ownership' },
   { href: '/blog/', label: 'Guides' },
@@ -71,6 +70,7 @@ const nav = [
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <script is:inline>(function(){try{var c=document.createElement('canvas');c.width=c.height=20;var x=c.getContext('2d');x.textBaseline='top';x.font='16px sans-serif';x.fillText('🇺🇸',0,0);var d=x.getImageData(0,0,20,20).data;for(var i=0;i<d.length;i+=4){if(d[i+3]&&(Math.abs(d[i]-d[i+1])>20||Math.abs(d[i+1]-d[i+2])>20))return;}document.documentElement.classList.add('no-flag-emoji');}catch(e){}})();</script>
     <meta name="theme-color" content="#1877f2" />
+    <meta name="google-site-verification" content="v2SWAHi25OI7s41vwhApLDe1mDMyIIlPV0SyZ28tkc4" />
     <link rel="alternate" type="application/rss+xml" title={`${SITE.name} guides`} href="/rss.xml" />
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:type" content={type} />
@@ -123,7 +123,7 @@ const nav = [
         <div class="footer-grid">
           <div>
             <h2>{SITE.name}</h2>
-            <p style="margin:0;color:var(--ink-2)">{SITE.tagline}. Independent, free, and built for renters and buyers in 27 markets.</p>
+            <p style="margin:0;color:var(--ink-2)">{SITE.tagline}. Independent, free, and built for renters and buyers around the world.</p>
           </div>
           <div>
             <h2>Calculators</h2>

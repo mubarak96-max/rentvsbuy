@@ -1,7 +1,7 @@
 ---
 title: "Rent vs Buy by City and Country: A Global Comparison"
-description: "Rent vs buy by city and country: price-to-rent ratios, gross yields and 10-year verdicts for 27 markets, and why the answer differs from Dubai to Toronto."
-h1: "Rent vs Buy Around the World: How 27 Cities and Countries Compare"
+description: "Rent vs buy by city and country: price-to-rent ratios, gross yields and 10-year verdicts by market, and why the answer differs from Dubai to Toronto."
+h1: "Rent vs Buy Around the World: How Cities and Countries Compare"
 primaryKeyword: "rent vs buy by city"
 keywords: ["rent vs buy around the world", "best countries to buy a house vs rent", "rent vs buy comparison by country", "price to rent ratio by country", "rental yield by country", "where is it better to rent than buy"]
 category: "Markets"
@@ -9,7 +9,7 @@ publishDate: 2026-11-06
 updatedDate: 2026-11-07
 tldr: "Whether renting or buying wins depends heavily on where you live. Using our illustrative defaults, buying comes out ahead over 10 years in places like Ireland, the UK, Dubai, Portugal, Spain and Japan, where rents are high relative to prices or borrowing is cheap. Renting wins in Toronto, Sydney, Hong Kong, India, Brazil and much of North America, where prices are high relative to rents or rates are steep."
 keyTakeaways:
-  - "Price-to-rent ratios across our 27 markets range from 12.5 (South Africa) to 40 (Switzerland)."
+  - "Price-to-rent ratios across our markets range from 12.5 (South Africa) to 40 (Switzerland)."
   - "A low price-to-rent ratio is not enough on its own: high mortgage rates and investment returns can still make renting win, as in Brazil and South Africa."
   - "Comparing gross rental yield with the mortgage rate is a quick, useful first screen."
   - "Transaction costs, rent rules and expected price growth explain most of the remaining differences."
@@ -27,7 +27,7 @@ relatedTool: "/rent-vs-buy-calculator/"
 
 ## Is it better to rent or buy in different cities and countries?
 
-Comparing rent vs buy by city shows that **the answer depends more on local prices, rents and interest rates than on any universal rule**. In our 27 market presets, buying wins over 10 years where rental yields are high relative to mortgage rates, such as Ireland, the UK, Dubai, Portugal and Japan. Renting wins where homes are expensive relative to rents or borrowing is costly, such as Toronto, Sydney, Hong Kong, India and Brazil.
+Comparing rent vs buy by city shows that **the answer depends more on local prices, rents and interest rates than on any universal rule**. In our market presets, buying wins over 10 years where rental yields are high relative to mortgage rates, such as Ireland, the UK, Dubai, Portugal and Japan. Renting wins where homes are expensive relative to rents or borrowing is costly, such as Toronto, Sydney, Hong Kong, India and Brazil.
 
 The figures below come from the default assumptions in our [rent vs buy calculator](/rent-vs-buy-calculator/), run over a 10-year horizon. They are **illustrative starting points, not forecasts or official averages**. Prices and rents vary widely within every country, so the useful lesson is the pattern, not any single figure.
 

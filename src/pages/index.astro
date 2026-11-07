@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Calculator from '../components/Calculator.tsx';
+import WorldMap from '../components/WorldMap.tsx';
 import Faq from '../components/Faq.astro';
 import MarketTable from '../components/MarketTable.astro';
 import PostGrid from '../components/PostGrid.astro';
@@ -37,7 +38,7 @@ const jsonLd = [
     applicationCategory: 'FinanceApplication',
     operatingSystem: 'Any (web browser)',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    featureList: ['27 housing market presets', 'Break-even year', 'Break-even rent', '5% rule check', 'Opportunity cost of deposit', 'Shared ownership mode', 'Shareable results link'],
+    featureList: ['Local housing market presets', 'Break-even year', 'Break-even rent', '5% rule check', 'Opportunity cost of deposit', 'Shared ownership mode', 'Shareable results link'],
     publisher: { '@id': `${Astro.site!.href}#org` },
   },
   {
@@ -47,24 +48,22 @@ const jsonLd = [
   },
 ];
 ---
-<Base title="Rent vs Buy Calculator: Should You Rent or Buy? (27 Markets)" description="Free rent vs buy calculator for the US, UK, Canada, Australia, UAE, India and 21 more markets. Local costs, break-even year, break-even rent and the 5% rule." jsonLd={jsonLd}>
+<Base title="Rent vs Buy Calculator: Should You Rent or Buy?" description="Free rent vs buy calculator for the US, UK, Canada, Australia, UAE, India and more. Local costs, break-even year, break-even rent and the 5% rule." jsonLd={jsonLd}>
   <div class="wrap">
-    <section class="hero">
-      <div class="hero-grid">
+    <section class="hero hero-atlas">
+      <div class="hero-head">
         <div>
           <h1>Rent vs Buy Calculator</h1>
-          <p class="lede">Should you rent or buy? Pick your market, adjust the numbers, and see which choice leaves you wealthier — including the year buying breaks even and the rent at which renting wins.</p>
-          <ul class="trust">
-            <li>Local taxes, fees &amp; rates</li>
-            <li>Opportunity cost included</li>
-            <li>Break-even rent</li>
-            <li>Shareable results</li>
-          </ul>
+          <p class="lede">Should you rent or buy? Explore the verdict across {MARKETS.length} housing markets on the map, then run the numbers for yours — including the year buying breaks even and the rent at which renting wins.</p>
         </div>
-        <div class="hero-img">
-          <img src="/images/hero.webp" alt="Illustration of a globe with homes and apartments, balanced on a scale between a house key and a rental lease" width="1600" height="1100" fetchpriority="high" />
-        </div>
+        <ul class="trust">
+          <li>Local taxes, fees &amp; rates</li>
+          <li>Opportunity cost included</li>
+          <li>Break-even rent</li>
+          <li>Shareable results</li>
+        </ul>
       </div>
+      <WorldMap client:load />
     </section>
 
     <section class="calc-section" id="calculator" aria-label="Rent vs buy calculator">

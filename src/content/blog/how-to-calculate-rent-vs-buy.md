@@ -160,4 +160,4 @@ The same layout works anywhere; only the inputs change. For Dubai, add the annua
 
 ## The faster way
 
-A spreadsheet is worth building once so you understand the mechanics. For everyday use, our [rent vs buy calculator](/rent-vs-buy-calculator/) runs the same simulation for 27 markets, finds the break-even year and break-even rent automatically, and lets you share the scenario by link. This is general information, not financial advice.
+A spreadsheet is worth building once so you understand the mechanics. For everyday use, our [rent vs buy calculator](/rent-vs-buy-calculator/) runs the same simulation for markets worldwide, finds the break-even year and break-even rent automatically, and lets you share the scenario by link. This is general information, not financial advice.

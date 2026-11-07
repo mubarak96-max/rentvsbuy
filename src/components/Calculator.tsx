@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import { MARKETS, getMarket, type Market } from '../data/markets';
 import { simulate, breakEvenRent, fivePercentRule, priceToRent, type Inputs } from '../lib/calc';
+import { guessMarket } from '../lib/guess-market';
 
 type Variant = 'standard' | 'shared-ownership';
 
@@ -95,25 +96,6 @@ function useFormatter(m: Market) {
 
 const REGIONS = ['Americas', 'Europe', 'Middle East & Africa', 'Asia-Pacific'] as const;
 
-const TZ_MARKET: Record<string, string> = {
-  'Asia/Dubai': 'uae', 'Asia/Muscat': 'uae', 'Asia/Riyadh': 'saudi-arabia', 'Asia/Kolkata': 'india', 'Asia/Calcutta': 'india',
-  'Asia/Singapore': 'singapore', 'Asia/Hong_Kong': 'hong-kong', 'Asia/Tokyo': 'japan', 'Europe/London': 'uk', 'Europe/Dublin': 'ireland',
-  'Europe/Berlin': 'germany', 'Europe/Paris': 'france', 'Europe/Madrid': 'spain', 'Europe/Amsterdam': 'netherlands', 'Europe/Zurich': 'switzerland',
-  'Europe/Rome': 'italy', 'Europe/Lisbon': 'portugal', 'Europe/Stockholm': 'sweden', 'Africa/Johannesburg': 'south-africa',
-  'America/Mexico_City': 'mexico', 'America/Sao_Paulo': 'brazil', 'Pacific/Auckland': 'new-zealand', 'America/New_York': 'us', 'America/Toronto': 'canada',
-  'America/Vancouver': 'canada', 'America/Edmonton': 'canada', 'America/Winnipeg': 'canada', 'America/Halifax': 'canada',
-};
-
-function guessMarket(): string | null {
-  try {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if (TZ_MARKET[tz]) return TZ_MARKET[tz];
-    if (tz.startsWith('Australia/')) return 'australia';
-    if (tz.startsWith('America/')) return 'us';
-  } catch { /* ignore */ }
-  return null;
-}
-
 export default function Calculator({ market = 'us', variant = 'standard', horizonYears = 10, autoDetect = false }: Props) {
   const [marketId, setMarketId] = useState(market);
   const m = getMarket(marketId);
@@ -145,6 +127,19 @@ export default function Calculator({ market = 'us', variant = 'standard', horizo
     setInputs(next);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // The world map (and anything else on the page) can load a market into this calculator.
+  useEffect(() => {
+    const onPick = (e: Event) => {
+      const { id, years } = (e as CustomEvent<{ id: string; years?: number }>).detail ?? {};
+      if (!id) return;
+      const mk = getMarket(id);
+      setMarketId(mk.id);
+      setInputs((prev) => fromMarket(mk, years ?? prev.years, variant));
+    };
+    window.addEventListener('rvb:market', onPick);
+    return () => window.removeEventListener('rvb:market', onPick);
+  }, [variant]);
 
   const result = useMemo(() => simulate(inputs), [inputs]);
   const beRent = useMemo(() => breakEvenRent(inputs), [inputs]);
