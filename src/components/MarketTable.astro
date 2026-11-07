@@ -43,7 +43,7 @@ const rows = MARKETS.map((m) => {
     <tbody>
       {rows.map((r) => (
         <tr>
-          <th scope="row" style="font-weight:600;text-align:left">{r.m.flag} {r.href ? <a href={r.href}>{r.m.name}</a> : r.m.name}</th>
+          <th scope="row" style="font-weight:600;text-align:left"><span class="flag" aria-hidden="true">{r.m.flag} </span>{r.href ? <a href={r.href}>{r.m.name}</a> : r.m.name}</th>
           <td>{r.price}</td>
           <td>{r.rent}</td>
           <td>{r.ptr.toFixed(1)}</td>

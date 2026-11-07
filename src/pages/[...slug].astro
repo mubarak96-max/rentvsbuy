@@ -72,7 +72,7 @@ const updated = d.updatedDate.toLocaleDateString('en-GB', { day: 'numeric', mont
 <Base title={d.title} description={d.description} crumbs={crumbs} jsonLd={jsonLd} modifiedTime={d.updatedDate}>
   <div class="wrap">
     <header class="hero" style="padding-top:8px">
-      <span class="eyebrow">{isCountry ? `${market.flag} ${market.name} · ${market.currency}` : 'Free calculator'}</span>
+      <span class="eyebrow">{isCountry ? <><span class="flag" aria-hidden="true">{market.flag} </span>{`${market.name} · ${market.currency}`}</> : 'Free calculator'}</span>
       <h1>{d.h1}</h1>
       <p class="lede">{d.intro}</p>
       <p class="meta">Updated {updated} · By {SITE.author} · <a href="/methodology/">Methodology</a></p>

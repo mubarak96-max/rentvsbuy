@@ -105,13 +105,11 @@ h3 { font-size: 1.25rem; margin: 1.8rem 0 0.5rem; }
 @media (max-width: 420px) { .calc-inputs fieldset { grid-template-columns: 1fr; } }
 .calc-note { font-size: 0.82rem; color: var(--ink-2); background: var(--amber-soft); border-radius: 10px; padding: 10px 12px; margin: 4px 0 10px; line-height: 1.5; }
 
-.verdict { border-radius: 14px; padding: 18px; color: #fff; }
-.verdict.buy { background: linear-gradient(135deg, #0b5fcc, var(--brand)); }
-.verdict.rent { background: linear-gradient(135deg, #a8532e, var(--rent)); }
+.verdict { border-radius: 14px; padding: 18px; color: #fff; background: var(--brand); }
 .verdict p { margin: 0; }
-.verdict-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; }
+.verdict-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; color: rgba(255, 255, 255, 0.85); }
 .verdict-main { font-family: var(--display); font-size: clamp(1.3rem, 2.6vw, 1.7rem); line-height: 1.25; margin: 4px 0 6px !important; }
-.verdict-sub { opacity: 0.92; font-size: 0.95rem; }
+.verdict-sub { color: rgba(255, 255, 255, 0.92); font-size: 0.95rem; }
 .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 14px 0; }
 @media (min-width: 640px) { .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .stat { background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 12px; min-width: 0; }
@@ -239,16 +237,33 @@ h3 { font-size: 1.25rem; margin: 1.8rem 0 0.5rem; }
 .fineprint { color: var(--muted); font-size: 0.82rem; margin-top: 24px; border-top: 1px solid var(--line); padding-top: 16px; }
 
 /* Form controls */
-.calc-top select {
-  appearance: none; -webkit-appearance: none; width: 100%;
-  font: inherit; font-size: 1rem; font-weight: 600; color: var(--ink);
-  height: 48px; padding: 0 44px 0 14px;
-  background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%2365676b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 16px center;
-  border: 1.5px solid var(--line); border-radius: 12px; cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-.calc-top select:hover { border-color: #ccd0d5; }
-.calc-top select:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-soft); }
+.calc-market { display: grid; gap: 6px; }
+.calc-market-label { font-size: 0.9rem; font-weight: 600; color: var(--ink-2); }
+.mselect { position: relative; }
+.mselect-btn { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; height: 48px; padding: 0 16px 0 14px; font: inherit; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; cursor: pointer; text-align: left; transition: border-color 0.15s, box-shadow 0.15s; }
+.mselect-btn:hover { border-color: #ccd0d5; }
+.mselect-btn:focus-visible, .mselect-btn[aria-expanded='true'] { outline: none; border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-soft); }
+.mselect-value { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+.mselect-value .mselect-name { font-weight: 600; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mselect .flag { font-size: 1.2rem; line-height: 1; flex: none; }
+.mselect-cur { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; color: var(--muted); background: var(--surface-2); padding: 3px 7px; border-radius: 6px; flex: none; }
+.mselect-chev { color: var(--muted); flex: none; transition: transform 0.15s; }
+.mselect-btn[aria-expanded='true'] .mselect-chev { transform: rotate(180deg); color: var(--brand); }
+.mselect-pop { position: absolute; z-index: 40; top: calc(100% + 6px); left: 0; right: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 12px 32px rgba(28, 30, 33, 0.14), 0 2px 6px rgba(28, 30, 33, 0.06); overflow: hidden; }
+.mselect-search { display: flex; align-items: center; gap: 8px; padding: 0 12px; margin: 8px; height: 40px; background: var(--surface-2); border-radius: 10px; color: var(--muted); }
+.mselect-search input { flex: 1; min-width: 0; border: 0; background: transparent; font: inherit; font-size: 0.95rem; color: var(--ink); outline: none; }
+.mselect-list { list-style: none; margin: 0; padding: 0 6px 6px; max-height: 320px; overflow-y: auto; overscroll-behavior: contain; }
+.mselect-group { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 10px 10px 4px; }
+.mselect-opt { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; cursor: pointer; font-size: 0.95rem; color: var(--ink); }
+.mselect-opt .mselect-name { flex: 1; min-width: 0; }
+.mselect-opt.is-active { background: var(--surface-2); }
+.mselect-opt.is-selected { color: var(--brand); font-weight: 600; }
+.mselect-opt.is-selected .mselect-cur { color: var(--brand); background: var(--brand-soft); }
+.mselect-check { color: var(--brand); flex: none; }
+.mselect-empty { padding: 14px 10px; color: var(--muted); font-size: 0.9rem; }
+
+/* Hidden when the OS renders flag emoji as letters (e.g. Windows) */
+.no-flag-emoji .flag { display: none !important; }
 
 input[type='range'] { -webkit-appearance: none; appearance: none; width: 100%; height: 28px; background: transparent; cursor: pointer; --pct: 30%; }
 input[type='range']:focus { outline: none; }

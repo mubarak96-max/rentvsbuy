@@ -76,7 +76,7 @@ const pct = (v: number) => `${v}%`;
             <thead><tr><th>Market</th><th>Rate</th><th>Deposit</th><th>Buy costs</th><th>Sell costs</th><th>Prop. tax</th><th>Maint.</th><th>Home growth</th><th>Rent growth</th><th>Invest return</th></tr></thead>
             <tbody>
               {MARKETS.map((m) => (
-                <tr><td>{m.flag} {m.name}</td><td>{pct(m.mortgageRate)}</td><td>{pct(m.downPaymentPct)}</td><td>{pct(m.buyingCostsPct)}</td><td>{pct(m.sellingCostsPct)}</td><td>{pct(m.propertyTaxPct)}</td><td>{pct(m.maintenancePct)}</td><td>{pct(m.appreciationPct)}</td><td>{pct(m.rentGrowthPct)}</td><td>{pct(m.investReturnPct)}</td></tr>
+                <tr><td><span class="flag" aria-hidden="true">{m.flag} </span>{m.name}</td><td>{pct(m.mortgageRate)}</td><td>{pct(m.downPaymentPct)}</td><td>{pct(m.buyingCostsPct)}</td><td>{pct(m.sellingCostsPct)}</td><td>{pct(m.propertyTaxPct)}</td><td>{pct(m.maintenancePct)}</td><td>{pct(m.appreciationPct)}</td><td>{pct(m.rentGrowthPct)}</td><td>{pct(m.investReturnPct)}</td></tr>
               ))}
             </tbody>
           </table>

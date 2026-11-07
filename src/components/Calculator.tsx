@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import { MARKETS, getMarket, type Market } from '../data/markets';
 import { simulate, breakEvenRent, fivePercentRule, priceToRent, type Inputs } from '../lib/calc';
 
@@ -175,18 +175,10 @@ export default function Calculator({ market = 'us', variant = 'standard', horizo
   return (
     <div className="calc" data-variant={variant}>
       <div className="calc-top">
-        <label className="calc-market">
-          <span>Market</span>
-          <select value={marketId} onChange={(e) => changeMarket(e.target.value)} aria-label="Choose a housing market">
-            {REGIONS.map((region) => (
-              <optgroup key={region} label={region}>
-                {MARKETS.filter((x) => x.region === region).map((x) => (
-                  <option key={x.id} value={x.id}>{x.flag} {x.name} ({x.currency})</option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
-        </label>
+        <div className="calc-market">
+          <span className="calc-market-label" id="market-label">Market</span>
+          <MarketSelect value={marketId} onChange={changeMarket} />
+        </div>
         <label className="calc-horizon">
           <span>How long will you stay? <strong>{h} {h === 1 ? 'year' : 'years'}</strong></span>
           <input type="range" min={1} max={30} step={1} value={h} style={{ '--pct': `${((h - 1) / 29) * 100}%` } as CSSProperties} onChange={(e) => set('years', Number(e.target.value))} aria-label="Years you plan to stay" />
@@ -207,7 +199,7 @@ export default function Calculator({ market = 'us', variant = 'standard', horizo
               {g.fields.map((f) => <NumberField key={f.key} f={f} value={inputs[f.key]} onChange={set} currency={m.currency} />)}
             </fieldset>
           ))}
-          <p className="calc-note"><strong>{m.flag} {m.name} defaults:</strong> {m.notes}</p>
+          <p className="calc-note"><strong><span className="flag" aria-hidden="true">{m.flag} </span>{m.name} defaults:</strong> {m.notes}</p>
           <button type="button" className="btn-ghost" onClick={() => changeMarket(marketId)}>Reset to {m.name} defaults</button>
         </form>
 
@@ -284,6 +276,120 @@ export default function Calculator({ market = 'us', variant = 'standard', horizo
           </div>
         </section>
       </div>
+    </div>
+  );
+}
+
+const ORDERED = REGIONS.flatMap((r) => MARKETS.filter((x) => x.region === r));
+
+function MarketSelect({ value, onChange }: { value: string; onChange: (id: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const [active, setActive] = useState(0);
+  const root = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const current = getMarket(value);
+
+  const q = query.trim().toLowerCase();
+  const options = q ? ORDERED.filter((x) => `${x.name} ${x.currency} ${x.region}`.toLowerCase().includes(q)) : ORDERED;
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => { if (!root.current?.contains(e.target as Node)) setOpen(false); };
+    document.addEventListener('mousedown', onDoc);
+    const i = Math.max(0, ORDERED.findIndex((x) => x.id === value));
+    setActive(i);
+    setQuery('');
+    requestAnimationFrame(() => {
+      searchRef.current?.focus();
+      listRef.current?.querySelector(`[data-i="${i}"]`)?.scrollIntoView({ block: 'center' });
+    });
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (open) listRef.current?.querySelector(`[data-i="${active}"]`)?.scrollIntoView({ block: 'nearest' });
+  }, [active, open]);
+
+  const pick = (id: string) => { onChange(id); setOpen(false); btnRef.current?.focus(); };
+
+  const onKey = (e: KeyboardEvent) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActive((a) => Math.min(options.length - 1, a + 1)); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive((a) => Math.max(0, a - 1)); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (options[active]) pick(options[active].id); }
+    else if (e.key === 'Escape') { e.preventDefault(); setOpen(false); btnRef.current?.focus(); }
+    else if (e.key === 'Tab') setOpen(false);
+  };
+
+  let lastRegion = '';
+  return (
+    <div className="mselect" ref={root}>
+      <button
+        ref={btnRef}
+        type="button"
+        className="mselect-btn"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-labelledby="market-label mselect-value"
+        onClick={() => setOpen((o) => !o)}
+        onKeyDown={(e) => { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); setOpen(true); } }}
+      >
+        <span id="mselect-value" className="mselect-value">
+          <span className="flag" aria-hidden="true">{current.flag}</span>
+          <span className="mselect-name">{current.name}</span>
+          <span className="mselect-cur">{current.currency}</span>
+        </span>
+        <svg className="mselect-chev" width="12" height="8" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5 6 6.5l5-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      </button>
+      {open && (
+        <div className="mselect-pop">
+          <div className="mselect-search">
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" strokeWidth="2" /><path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+            <input
+              ref={searchRef}
+              type="text"
+              placeholder="Search markets"
+              value={query}
+              onChange={(e) => { setQuery(e.target.value); setActive(0); }}
+              onKeyDown={onKey}
+              role="combobox"
+              aria-expanded="true"
+              aria-controls="mselect-list"
+              aria-activedescendant={options[active] ? `mopt-${options[active].id}` : undefined}
+              aria-label="Search markets"
+            />
+          </div>
+          <ul className="mselect-list" id="mselect-list" role="listbox" aria-labelledby="market-label" ref={listRef}>
+            {options.length === 0 && <li className="mselect-empty">No markets match “{query}”</li>}
+            {options.map((x, i) => {
+              const head = !q && x.region !== lastRegion ? x.region : null;
+              lastRegion = x.region;
+              return (
+                <li key={x.id} role="presentation">
+                  {head && <div className="mselect-group" role="presentation">{head}</div>}
+                  <div
+                    id={`mopt-${x.id}`}
+                    data-i={i}
+                    role="option"
+                    aria-selected={x.id === value}
+                    className={`mselect-opt${i === active ? ' is-active' : ''}${x.id === value ? ' is-selected' : ''}`}
+                    onMouseEnter={() => setActive(i)}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => pick(x.id)}
+                  >
+                    <span className="flag" aria-hidden="true">{x.flag}</span>
+                    <span className="mselect-name">{x.name}</span>
+                    <span className="mselect-cur">{x.currency}</span>
+                    {x.id === value && <svg className="mselect-check" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
